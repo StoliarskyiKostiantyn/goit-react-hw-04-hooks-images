@@ -1,58 +1,38 @@
-import './App.css';
-import React, { Component } from 'react';
-import Searchbar from './Components/Searchbar/Searchbar';
-import ImageGallery from './Components/ImageGallery/ImageGallery';
-import Loaders from './Components/Loader/Loader';
-export default class App extends Component {
-  state = {
-    search: '',
-    loaderAreShown: false,
-  };
-
-  handleSubmit = evt => {
+import "./App.css";
+import React, { useState } from "react";
+import Searchbar from "./Components/Searchbar/Searchbar";
+import ImageGallery from "./Components/ImageGallery/ImageGallery";
+import Loaders from "./Components/Loader/Loader";
+export default function App() {
+  const [search, setSearch] = useState("");
+  const [loaderAreShown, setLoaderAreShown] = useState(false);
+  const handleSubmit = (evt) => {
     const inputValue = evt.target[0].value;
-    this.setState(prevState => ({
-      loaderAreShown: true,
-    }));
-
+    setLoaderAreShown(true);
     evt.preventDefault();
-
-    if (inputValue.trim() === '') {
-      alert('Введите ключевое слово для поиска картинок');
+    if (inputValue.trim() === "") {
+      alert("Введите ключевое слово для поиска картинок");
       return;
     }
-
-    this.setState({ search: inputValue });
-    evt.target[0].value = '';
+    setSearch(inputValue);
+    evt.target[0].value = "";
   };
-  showLoader = () => {
-    this.setState(prevState => ({
-      loaderAreShown: true,
-    }));
+  const hideLoader = () => {
+    setLoaderAreShown(false);
   };
-  hideLoader = () => {
-    this.setState(prevState => ({
-      loaderAreShown: false,
-    }));
+  const showLoader = () => {
+    setLoaderAreShown(true);
   };
-  render() {
-    const { search, loaderAreShown } = this.state;
-    const searchCheck = this.state.search === '';
-    return (
-      <>
-        <div>
-          <Searchbar
-            onSubmit={this.handleSubmit}
-          />
-          {loaderAreShown && <Loaders />}
-          {!searchCheck && (
-            <ImageGallery
-              search={search}
-              hideLoader={this.hideLoader}
-            />
-          )}
-        </div>
-      </>
-    );
-  }
+  const searchCheck = search === "";
+  return (
+    <>
+      <div>
+        <Searchbar onSubmit={handleSubmit} />
+        {loaderAreShown && <Loaders />}
+        {!searchCheck && (
+          <ImageGallery search={search} hideLoader={hideLoader} />
+        )}
+      </div>
+    </>
+  );
 }
