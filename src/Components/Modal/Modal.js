@@ -12,7 +12,7 @@ export default function Modal({ url, closeModal }) {
       backdropRef.removeEventListener("click", closeModal);
       window.removeEventListener("keydown", closeModal);
     };
-  });
+  }, []);
   return createPortal(
     <div className={s.backdrop}>
       <img src={url} alt="" />
