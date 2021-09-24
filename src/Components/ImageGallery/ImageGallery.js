@@ -10,20 +10,38 @@ export default function ImageGallery({ search, hideLoader }) {
   const [modalUrl, setModalUrl] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [response, setResponse] = useState([]);
-  const [error, setError] = useState(null);
+
+  let mainPage = page;
+  const scroll = () => {
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+  };
+  const openModal = (evt) => {
+    if (evt.target.nodeName === "IMG") {
+      setModalIsOpen(true);
+      setModalUrl(evt.target.dataset.big_image);
+    }
+  };
+  const closeModal = (evt) => {
+    if (evt.target.nodeName === "DIV" || evt.code === "Escape") {
+      setModalIsOpen(false);
+    }
+  };
+
   useEffect(() => {
     const list = document.querySelector("ul");
-    fetchImagesByName();
     list.addEventListener("click", openModal);
+    return () => {
+      list.removeEventListener("click", openModal);
+    };
   }, []);
   useEffect(() => {
+    mainPage = 1;
     setResponse([]);
     fetchImagesByName();
   }, [search]);
-  useEffect(() => {
-    fetchImagesByName().then(scroll);
-  }, [page]);
-
   const fetchImagesByName = () => {
     const errorMessage = `Изображений по ключевому слову ${search} не найдено`;
     return api
@@ -32,32 +50,12 @@ export default function ImageGallery({ search, hideLoader }) {
         if (data.hits.length === 0) {
           return Promise.reject(new Error(errorMessage));
         }
-        return setResponse((prevState) => [...prevState, ...data.hits]);
+        return setResponse((response) => [...response, ...data.hits]);
       })
       .catch((error) => alert(error.message))
       .finally(() => {
         hideLoader();
       });
-  };
-  const openModal = (evt) => {
-    if (evt.target.nodeName === "IMG") {
-      setModalIsOpen(true);
-      setModalUrl(evt.target.dataset.big_image);
-    }
-  };
-  const scroll = () => {
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: "smooth",
-    });
-  };
-  const increasePage = () => {
-    setPage((prevState) => prevState.page + 1);
-  };
-  const closeModal = (evt) => {
-    if (evt.target.nodeName === "DIV" || evt.code === "Escape") {
-      setModalIsOpen(false);
-    }
   };
 
   return (
@@ -75,6 +73,7 @@ export default function ImageGallery({ search, hideLoader }) {
                 openModal={(evt) => openModal(evt)}
                 hideLoader={hideLoader}
                 search={search}
+                setPage={setPage}
                 page={page}
                 scroll={scroll}
               />
@@ -82,7 +81,7 @@ export default function ImageGallery({ search, hideLoader }) {
           })}
         </ul>
       </div>
-      <Button onClick={increasePage} />
+      <Button onClick={() => setPage((page) => page + 1)} />
       {modalIsOpen && (
         <Modal url={modalUrl} closeModal={(evt) => closeModal(evt)} />
       )}

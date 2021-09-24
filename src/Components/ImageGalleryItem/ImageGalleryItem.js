@@ -4,11 +4,12 @@ import s from "./ImageGalleryItem";
 
 export default class ImageGalleryItem extends Component {
   render() {
-    const { webformatURL, tags, largeImageURL } = this.props;
+    const { webformatURL, tags, largeImageURL, openModal } = this.props;
     return (
       <li key={webformatURL} className={s.ImageGalleryItem}>
         <a>
           <img
+            onClick={openModal}
             src={webformatURL}
             alt={tags}
             data-big_image={largeImageURL}
